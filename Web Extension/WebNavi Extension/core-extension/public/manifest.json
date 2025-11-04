@@ -1,0 +1,20 @@
+{
+  "manifest_version": 3,
+  "name": "WebNavi",
+  "version": "1.0",
+  "description": "",
+  "permissions": ["sidePanel","tabs","microphone", "storage", "activeTab", "scripting"],
+  "action": {
+    "default_popup": "index.html"
+  },
+  "host_permissions": ["http://localhost:7878/*"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "web_accessible_resources": [
+  {
+    "resources": ["landingpage.html"],
+    "matches": ["<all_urls>"]
+  }
+]
+}
