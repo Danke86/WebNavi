@@ -5,7 +5,10 @@
   "description": "",
   "permissions": ["sidePanel","tabs","microphone", "storage", "activeTab", "scripting"],
   "action": {
-    "default_popup": "index.html"
+    "default_title": "Open WebNavi"
+  },
+  "side_panel": {
+    "default_path": "index.html"
   },
   "host_permissions": ["http://localhost:7878/*"],
   "background": {

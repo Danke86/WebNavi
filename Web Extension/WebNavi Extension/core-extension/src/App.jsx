@@ -17,7 +17,7 @@ function App() {
     recognition.onresult = (event) => {
       const transcript = event.results[event.resultIndex][0].transcript.trim().toLowerCase();
       console.log(transcript)
-      if (transcript.includes("hey navi")) {
+      if (transcript.includes("hey navi") || transcript.includes("hey nabi") || transcript.includes("hi nabi") || transcript.includes("hi navi") || transcript.includes("hay navi")) {
         startRecording();
       }
     };
@@ -50,7 +50,7 @@ const startRecording = async () => {
 
     let silenceStart = performance.now();
     const SILENCE_THRESHOLD = 10; // volume level (0–255)
-    const SILENCE_DURATION = 2000; // 2 seconds of silence
+    const SILENCE_DURATION = 3000; // 3 seconds of silence
 
     // Function to check for silence
     const checkSilence = () => {
@@ -173,8 +173,10 @@ const startRecording = async () => {
       </form>
 
       <div className="status-bar">
-        <div className={`status-dot ${recording ? "recording" : status.toLowerCase()}`}></div>
-        <span>{status}</span>
+        <div className="status-indicator">
+          <div className={`status-dot ${recording ? "recording" : status.toLowerCase()}`}></div>
+          <span className="status-txt">{status}</span>
+        </div>
         <button
           className={`wake-toggle ${listening ? "on" : "off"}`}
           onClick={() => setListening(!listening)}
@@ -184,7 +186,7 @@ const startRecording = async () => {
       </div>
 
       <button className="mic-btn" onClick={requestMicAccess}>
-        🎙️ Grant Mic Access
+        🎙️ Grant Permissions
       </button>
     </div>
   );

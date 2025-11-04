@@ -2,24 +2,32 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
 
 
-body, html {
+html, body {
   margin: 0;
   padding: 0;
   font-family: "Poppins", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   color: #222;
-  width: 360px;
-  height: 610px;
+  width: 100%;
+  height: 100%;
   overflow: hidden;
 }
 
+#root {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+}
+
 .app-container {
-  width: 350px;
-  height: 600px;
+  flex: 1;
+  width: 100%;
+  height: 100%;
   display: flex;
   flex-direction: column;
   background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+  border-radius: 0; 
+  box-shadow: none;
   overflow: hidden;
   padding: 10px;
 }
@@ -40,8 +48,6 @@ body, html {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  overflow-y: auto;
-  padding: 10px;
 }
 
 .chat-bubble {
@@ -121,6 +127,9 @@ body, html {
   height: 10px;
   border-radius: 50%;
   background: gray;
+  flex-shrink: 0; /* prevents shrinking in flex */
+  display: inline-block;
+  vertical-align: middle; /* aligns with text baseline */
 }
 
 .status-dot.recording {
@@ -134,6 +143,12 @@ body, html {
 
 .status-dot.processing {
   background: orange;
+}
+
+.status-indicator{
+  display: flex;
+  align-items: left;
+  gap: 6px;
 }
 
 .wake-toggle {
@@ -154,13 +169,105 @@ body, html {
   color: #8b0000;
 }
 
+
+
+* {
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  box-sizing: border-box;
+}
+
+.mic-btn {
+  border: none;
+  background: #059700;
+  color: #fff;
+  font-size: 1rem;
+  padding: 4px 8px; /* added padding */
+  margin-left: 6px;
+  margin-right: 6px;
+  margin-top: 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mic-btn:hover {
+  background: #024b00;
+}
+
+:root {
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  font-weight: 500;
+  color: #646cff;
+  text-decoration: inherit;
+}
+a:hover {
+  color: #535bf2;
+}
+
+/* body {
+  margin: 0;
+  display: flex;
+  place-items: center;
+  min-width: 320px;
+  ;
+} */
+
+h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
+}
+
+button {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #1a1a1a;
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
+button:hover {
+  border-color: #646cff;
+}
+button:focus,
+button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+}
+
 @keyframes pulse {
   0% { opacity: 1; }
   50% { opacity: 0.4; }
   100% { opacity: 1; }
 }
 
-* {
-  -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
+@media (prefers-color-scheme: light) {
+  :root {
+    color: #213547;
+    background-color: #ffffff;
+  }
+  a:hover {
+    color: #747bff;
+  }
+  button {
+    background-color: #f9f9f9;
+  }
 }
