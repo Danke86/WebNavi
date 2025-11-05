@@ -8,6 +8,28 @@ function App() {
   const [status, setStatus] = useState("Idle");
   const [history, setHistory] = useState([]); // store all transcriptions
 
+
+  useEffect(() => {
+    const checkServer = async () => {
+      try {
+        const res = await fetch("http://localhost:7878/ping");
+        if (res.ok) {
+          setStatus("Idle"); // server is online
+        } else {
+          setStatus("Offline");
+        }
+      } catch (err) {
+        console.log(err)
+        setStatus(`Offline`); // server unreachablew
+      }
+    };
+
+    checkServer(); // check immediately
+    const interval = setInterval(checkServer, 5000); // check every 5 seconds
+
+    return () => clearInterval(interval);
+  }, []);
+
   // --- Wake word detection ---
   useEffect(() => {
     const recognition = new window.webkitSpeechRecognition();

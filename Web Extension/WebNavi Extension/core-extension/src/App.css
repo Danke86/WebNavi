@@ -145,6 +145,10 @@ html, body {
   background: orange;
 }
 
+.status-dot.offline {
+  background: grey;
+}
+
 .status-indicator{
   display: flex;
   align-items: left;

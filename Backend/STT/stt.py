@@ -34,5 +34,9 @@ async def transcribe_audio(file: UploadFile = File(...)):
     text = result["text"]
     return {"text": text}
 
+@app.get("/ping")
+async def ping():
+    return {"status": "ok"}
+
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=7878)
