@@ -1,15 +1,20 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import { resolve } from "path";
+import path from "path";
 
 export default defineConfig({
   plugins: [react()],
+  optimizeDeps: {
+    exclude: ['playwright-crx']
+  },
   build: {
+    minify: false,
     outDir: "dist",
+    emptyOutDir: true,
     rollupOptions: {
       input: {
-        popup: "index.html",            // main extension popup
-        landing: "landingpage.html",    // landing page
+        popup: path.resolve(__dirname, 'index.html'),            // main extension popup
+        landing: path.resolve(__dirname, 'landingpage.html'),    // landing page
       },
       output: {
         entryFileNames: `[name].js`,
