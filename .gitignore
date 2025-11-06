@@ -6,3 +6,8 @@ Backend/LLM/test/weblinx_test.jsonl
 Backend/LLM/test/weblinx_train.jsonl
 Backend/LLM/test/weblinx_val.jsonl
 'Web Extension'/'WebNavi Extension'/dependencies
+'Web Extension'/'WebNavi Extension'/core-extension/.env
+Web Extension/WebNavi Extension/core-extension/.env
+Web Extension/WebNavi Extension/dependencies/playwright-crx
+Web Extension/WebNavi Extension/dependencies
+Web Extension/WebNavi Extension/dependencies/playwright-crx

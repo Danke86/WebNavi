@@ -10,7 +10,7 @@
   "side_panel": {
     "default_path": "index.html"
   },
-  "host_permissions": ["http://localhost:7878/*"],
+  "host_permissions": ["<all_urls>"],
   "background": {
     "service_worker": "background.js",
     "type":"module"

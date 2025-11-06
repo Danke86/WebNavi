@@ -8,11 +8,11 @@ function App() {
   const [status, setStatus] = useState("Idle");
   const [history, setHistory] = useState([]); // store all transcriptions
 
-
+  // -- Check if backend is responding --
   useEffect(() => {
     const checkServer = async () => {
       try {
-        const res = await fetch("http://localhost:7878/ping");
+        const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/ping`);
         if (res.ok) {
           setStatus("Idle"); // server is online
         } else {
@@ -106,7 +106,7 @@ function App() {
         formData.append("file", blob, "recording.webm");
 
         try {
-          const res = await fetch("http://localhost:7878/transcribe", {
+          const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/transcribe`, {
             method: "POST",
             body: formData,
           });
