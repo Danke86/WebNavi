@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "playwright-crx": "file:../dependencies/playwright-crx",
     "react": "^19.1.1",
     "react-dom": "^19.1.1"
   },

@@ -53,96 +53,96 @@ function App() {
   }, [listening]);
 
   // --- Voice recording + Whisper call ---
-const startRecording = async () => {
-  try {
-    setListening(false);
-    setStatus("Recording...");
-    setRecording(true);
+  const startRecording = async () => {
+    try {
+      setListening(false);
+      setStatus("Recording...");
+      setRecording(true);
 
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    const recorder = new MediaRecorder(stream);
-    const chunks = [];
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const recorder = new MediaRecorder(stream);
+      const chunks = [];
 
-    // --- Setup AudioContext for silence detection ---
-    const audioContext = new AudioContext();
-    const source = audioContext.createMediaStreamSource(stream);
-    const analyser = audioContext.createAnalyser();
-    const dataArray = new Uint8Array(analyser.fftSize);
-    source.connect(analyser);
+      // --- Setup AudioContext for silence detection ---
+      const audioContext = new AudioContext();
+      const source = audioContext.createMediaStreamSource(stream);
+      const analyser = audioContext.createAnalyser();
+      const dataArray = new Uint8Array(analyser.fftSize);
+      source.connect(analyser);
 
-    let silenceStart = performance.now();
-    const SILENCE_THRESHOLD = 10; // volume level (0–255)
-    const SILENCE_DURATION = 3000; // 3 seconds of silence
+      let silenceStart = performance.now();
+      const SILENCE_THRESHOLD = 10; // volume level (0–255)
+      const SILENCE_DURATION = 3000; // 3 seconds of silence
 
-    // Function to check for silence
-    const checkSilence = () => {
-      analyser.getByteFrequencyData(dataArray);
-      const average =
-        dataArray.reduce((a, b) => a + b, 0) / dataArray.length;
+      // Function to check for silence
+      const checkSilence = () => {
+        analyser.getByteFrequencyData(dataArray);
+        const average =
+          dataArray.reduce((a, b) => a + b, 0) / dataArray.length;
 
-      if (average < SILENCE_THRESHOLD) {
-        // Low volume
-        if (performance.now() - silenceStart > SILENCE_DURATION) {
-          console.log("Silence detected. Stopping recorder...");
-          recorder.stop();
-          stream.getTracks().forEach((track) => track.stop());
-          audioContext.close();
-          return;
-        }
-      } else {
-        silenceStart = performance.now(); // Reset timer if sound is detected
-      }
-
-      requestAnimationFrame(checkSilence);
-    };
-
-    checkSilence();
-
-    recorder.ondataavailable = (e) => chunks.push(e.data);
-    recorder.onstop = async () => {
-      setStatus("Processing...");
-      const blob = new Blob(chunks, { type: "audio/webm" });
-      const formData = new FormData();
-      formData.append("file", blob, "recording.webm");
-
-      try {
-        const res = await fetch("http://localhost:7878/transcribe", {
-          method: "POST",
-          body: formData,
-        });
-
-        const data = await res.json();
-
-        const transcript = data.text?.trim();
-
-        if (transcript) {
-            setHistory((prev) => [...prev, { sender: "user", msg: transcript }]);
-
-            const reply = await handleSend(transcript);
+        if (average < SILENCE_THRESHOLD) {
+          // Low volume
+          if (performance.now() - silenceStart > SILENCE_DURATION) {
+            console.log("Silence detected. Stopping recorder...");
+            recorder.stop();
+            stream.getTracks().forEach((track) => track.stop());
+            audioContext.close();
+            return;
           }
+        } else {
+          silenceStart = performance.now(); // Reset timer if sound is detected
+        }
+
+        requestAnimationFrame(checkSilence);
+      };
+
+      checkSilence();
+
+      recorder.ondataavailable = (e) => chunks.push(e.data);
+      recorder.onstop = async () => {
+        setStatus("Processing...");
+        const blob = new Blob(chunks, { type: "audio/webm" });
+        const formData = new FormData();
+        formData.append("file", blob, "recording.webm");
+
+        try {
+          const res = await fetch("http://localhost:7878/transcribe", {
+            method: "POST",
+            body: formData,
+          });
+
+          const data = await res.json();
+
+          const transcript = data.text?.trim();
+
+          if (transcript) {
+              setHistory((prev) => [...prev, { sender: "user", msg: transcript }]);
+
+              const reply = await handleSend(transcript);
+            }
 
 
-        // setText(data.text);
-        // setHistory((prev) => [...prev, data.text]);
-      } catch (err) {
-        console.error("Transcription error:", err);
-        setStatus("Error");
-      } finally {
-        setRecording(false);
-        setStatus("Idle");
-        setListening(true);
-      }
-    };
+          // setText(data.text);
+          // setHistory((prev) => [...prev, data.text]);
+        } catch (err) {
+          console.error("Transcription error:", err);
+          setStatus("Error");
+        } finally {
+          setRecording(false);
+          setStatus("Idle");
+          setListening(true);
+        }
+      };
 
-    recorder.start();
-    console.log("Recording started...");
-  } catch (err) {
-    console.error(err);
-    setStatus("Error");
-    setRecording(false);
-    setListening(true);
-  }
-};
+      recorder.start();
+      console.log("Recording started...");
+    } catch (err) {
+      console.error(err);
+      setStatus("Error");
+      setRecording(false);
+      setListening(true);
+    }
+  };
 
  // --- Manual text submission ---
   const handleSend = async (e) => {

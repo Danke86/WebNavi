@@ -3,21 +3,32 @@
   "name": "WebNavi",
   "version": "1.0",
   "description": "",
-  "permissions": ["sidePanel","tabs","microphone", "storage", "activeTab", "scripting"],
+  "permissions": ["debugger", "tabs", "sidePanel", "storage", "activeTab", "commands", "scripting"],
   "action": {
-    "default_title": "Open WebNavi"
+    "default_title": "WebNavi"
   },
   "side_panel": {
     "default_path": "index.html"
   },
   "host_permissions": ["http://localhost:7878/*"],
   "background": {
-    "service_worker": "background.js"
+    "service_worker": "background.js",
+    "type":"module"
   },
   "web_accessible_resources": [
   {
     "resources": ["landingpage.html"],
     "matches": ["<all_urls>"]
   }
-]
+  ],
+  "commands":{
+    "_execute_action": {
+      "suggested_key": {
+        "default": "Alt+Shift+B",
+        "mac": "Alt+Shift+B"
+      },
+      "description": "Open side panel",
+      "global": false
+    }
+  }
 }
