@@ -1,11 +1,14 @@
 import { useState, useEffect } from "react";
-import { GrantPermissionsButton } from "./components/GrantPermissionsButton";
 import "./app.css";
+
+
+import { GrantPermissionsButton } from "./components/GrantPermissionsButton";
+import { StatusBar } from "./components/StatusBar.jsx";
 
 function App() {
   const [text, setText] = useState("");
-  const [listening, setListening] = useState(true);
-  const [recording, setRecording] = useState(false);
+  const [listening, setListening] = useState(true); //WAKE WORD
+  const [recording, setRecording] = useState(false); //RECORDING FOR LLM/TEXT MESSAGE
   const [status, setStatus] = useState("Idle");
   const [history, setHistory] = useState([]); // store all transcriptions
 
@@ -180,19 +183,12 @@ function App() {
         />
         <button type="submit">➤</button>
       </form>
-      
-      <div className="status-bar">
-        <div className="status-indicator">
-          <div className={`status-dot ${recording ? "recording" : status.toLowerCase()}`}></div>
-          <span className="status-txt">{status}</span>
-        </div>
-        <button
-          className={`wake-toggle ${listening ? "on" : "off"}`}
-          onClick={() => setListening(!listening)}
-        >
-          {listening ? "Wake: ON" : "Wake: OFF"}
-        </button>
-      </div>
+
+      <StatusBar 
+        status = {status}
+        listening = {listening}
+        setListening = {setListening}
+      />
 
       <GrantPermissionsButton/>
       
