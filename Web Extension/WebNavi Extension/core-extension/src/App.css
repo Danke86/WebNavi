@@ -109,6 +109,11 @@ html, body {
   cursor: pointer;
 }
 
+.input-bar button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .input-bar button:hover {
   background: #024b00;
 }

@@ -195,7 +195,7 @@ function App() {
           onChange={(e) => setText(e.target.value)}
           disabled={status === "Idle" ? false : true }
         />
-        <button onClick={() => handleSend(text)}>➤</button>
+        <button disabled={status === "Idle" ? false : true } onClick={() => handleSend(text)}>➤</button>
       </div>
 
       <StatusBar 
