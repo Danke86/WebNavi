@@ -161,6 +161,11 @@ function App() {
     const message = text.trim();
     setHistory((prev) => [...prev, { sender: sender, msg: message }]);
     setText("");
+
+
+    // ADD LLM COMMAND HERE 
+    // Send message to service worker
+    // Service worker 
   };
 
    return (
