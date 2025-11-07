@@ -30,6 +30,22 @@ export function useWakeWord({ startRecording, wakeword, setWakeWord, status, set
         recognition.onerror = (e) => console.error("Wake-word error:", e);
         // console.log("Current status in useEffect: ", status)
 
+        recognition.onend = () => {
+            // console.log("Wake word recognition ended");
+
+            // Restart if still enabled and status is Idle
+            if (wakeword && statusRef.current === "Idle") {
+                // console.log("Restarting wake word recognition...");
+                setTimeout(() => {
+                try {
+                    recognition.start();
+                } catch (err) {
+                    console.warn("Recognition restart failed:", err.message);
+                }
+                }, 100);
+            }
+        };
+
         if (wakeword) recognition.start();
         else recognition.stop();
 
@@ -37,3 +53,4 @@ export function useWakeWord({ startRecording, wakeword, setWakeWord, status, set
     }, [wakeword]);
 
 }
+
