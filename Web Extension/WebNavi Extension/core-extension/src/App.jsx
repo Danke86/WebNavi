@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { GrantPermissionsButton } from "./components/GrantPermissionsButton";
 import "./app.css";
 
 function App() {
@@ -150,16 +151,6 @@ function App() {
     setText("");
   };
 
-  // --- Ask mic permission manually (required on first popup open) ---
-  const requestMicAccess = async () => {
-  try {
-    await navigator.mediaDevices.getUserMedia({ audio: true });
-    alert("Microphone access already granted!");
-  } catch (err) {
-    chrome.tabs.create({ url: chrome.runtime.getURL("landingpage.html") });
-  }
-  };
-
    return (
     <div className="app-container">
       <h2 className="app-title">WebNavi</h2>
@@ -189,7 +180,7 @@ function App() {
         />
         <button type="submit">➤</button>
       </form>
-
+      
       <div className="status-bar">
         <div className="status-indicator">
           <div className={`status-dot ${recording ? "recording" : status.toLowerCase()}`}></div>
@@ -203,9 +194,8 @@ function App() {
         </button>
       </div>
 
-      <button className="mic-btn" onClick={requestMicAccess}>
-        🎙️ Grant Permissions
-      </button>
+      <GrantPermissionsButton/>
+      
     </div>
   );
 }
