@@ -120,10 +120,6 @@ function App() {
 
               const reply = await handleSend(transcript);
             }
-
-
-          // setText(data.text);
-          // setHistory((prev) => [...prev, data.text]);
         } catch (err) {
           console.error("Transcription error:", err);
           setStatus("Error");
@@ -144,7 +140,7 @@ function App() {
     }
   };
 
- // --- Manual text submission ---
+  // --- Manual text submission ---
   const handleSend = async (e) => {
     e.preventDefault();
     if (!text.trim()) return;

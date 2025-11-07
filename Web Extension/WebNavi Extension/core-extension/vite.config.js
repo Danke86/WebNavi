@@ -13,8 +13,9 @@ export default defineConfig({
     emptyOutDir: true,
     rollupOptions: {
       input: {
-        popup: path.resolve(__dirname, 'index.html'),            // main extension popup
-        landing: path.resolve(__dirname, 'landingpage.html'),    // landing page
+        background: path.resolve(__dirname, 'src/background/background.js'),  
+        sidepanel: path.resolve(__dirname, 'index.html'),                     // main extension popup
+        landing: path.resolve(__dirname, 'landingpage.html'),                 // landing page
       },
       output: {
         entryFileNames: `[name].js`,
