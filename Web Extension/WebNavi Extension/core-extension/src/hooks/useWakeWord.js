@@ -27,8 +27,16 @@ export function useWakeWord({ startRecording, wakeword, setWakeWord, status, set
         }
         };
 
-        recognition.onerror = (e) => console.error("Wake-word error:", e);
-        // console.log("Current status in useEffect: ", status)
+        recognition.onerror = (e) => {
+            if (e.error === "no-speech"){
+                return;
+            }else{
+                console.error("Wake-word error:", e);
+                return;
+            }
+            
+        }
+            
 
         recognition.onend = () => {
             // console.log("Wake word recognition ended");

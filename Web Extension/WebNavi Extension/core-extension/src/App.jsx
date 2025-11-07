@@ -70,8 +70,8 @@ function App() {
         console.log("Transcription:", transcript);
         
         if (transcript) {
-          setHistory((prev) => [...prev, { sender: "user", msg: transcript }]);
-          await handleSend(transcript);
+          // setHistory((prev) => [...prev, { sender: "user", msg: transcript }]);
+          await handleSend("user", transcript);
 
          
         } else {
@@ -155,12 +155,11 @@ function App() {
   });
 
   // --- Manual text submission ---
-  const handleSend = async (e) => {
-    e.preventDefault();
+  const handleSend = async (sender, text) => {
     if (!text.trim()) return;
 
     const message = text.trim();
-    setHistory((prev) => [...prev, { sender: "user", msg: message }]);
+    setHistory((prev) => [...prev, { sender: sender, msg: message }]);
     setText("");
   };
 
@@ -191,7 +190,7 @@ function App() {
           onChange={(e) => setText(e.target.value)}
           disabled={status === "Idle" ? false : true }
         />
-        <button type="submit">➤</button>
+        <button onClick={() => handleSend(text)}>➤</button>
       </form>
 
       <StatusBar 
