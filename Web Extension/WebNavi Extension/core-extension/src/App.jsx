@@ -9,7 +9,7 @@ function App() {
   const [text, setText] = useState("");
   const [listening, setListening] = useState(true); //WAKE WORD
   const [recording, setRecording] = useState(false); //RECORDING FOR LLM/TEXT MESSAGE
-  const [status, setStatus] = useState("Idle");
+  const [status, setStatus] = useState("Idle"); // Offline, Idle, Recording, Processing, 
   const [history, setHistory] = useState([]); // store all transcriptions
 
   // -- Check if backend is responding --
@@ -36,6 +36,9 @@ function App() {
 
   // --- Wake word detection ---
   useEffect(() => {
+    // if processing or offline, skip wake word
+    // if (status === "Processing" || status === "Offline") return;
+
     const recognition = new window.webkitSpeechRecognition();
     recognition.continuous = true;
     recognition.lang = "en-US";
@@ -54,57 +57,22 @@ function App() {
     else recognition.stop();
 
     return () => recognition.stop();
-  }, [listening]);
+  }, [listening, status]);
 
   // --- Voice recording + Whisper call ---
   const startRecording = async () => {
     try {
       setListening(false);
-      setStatus("Recording...");
+      setStatus("Recording");
       setRecording(true);
 
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       const recorder = new MediaRecorder(stream);
       const chunks = [];
 
-      // --- Setup AudioContext for silence detection ---
-      const audioContext = new AudioContext();
-      const source = audioContext.createMediaStreamSource(stream);
-      const analyser = audioContext.createAnalyser();
-      const dataArray = new Uint8Array(analyser.fftSize);
-      source.connect(analyser);
-
-      let silenceStart = performance.now();
-      const SILENCE_THRESHOLD = 10; // volume level (0–255)
-      const SILENCE_DURATION = 3000; // 3 seconds of silence
-
-      // Function to check for silence
-      const checkSilence = () => {
-        analyser.getByteFrequencyData(dataArray);
-        const average =
-          dataArray.reduce((a, b) => a + b, 0) / dataArray.length;
-
-        if (average < SILENCE_THRESHOLD) {
-          // Low volume
-          if (performance.now() - silenceStart > SILENCE_DURATION) {
-            console.log("Silence detected. Stopping recorder...");
-            recorder.stop();
-            stream.getTracks().forEach((track) => track.stop());
-            audioContext.close();
-            return;
-          }
-        } else {
-          silenceStart = performance.now(); // Reset timer if sound is detected
-        }
-
-        requestAnimationFrame(checkSilence);
-      };
-
-      checkSilence();
-
       recorder.ondataavailable = (e) => chunks.push(e.data);
       recorder.onstop = async () => {
-        setStatus("Processing...");
+        setStatus("Processing");
         const blob = new Blob(chunks, { type: "audio/webm" });
         const formData = new FormData();
         formData.append("file", blob, "recording.webm");
@@ -118,7 +86,7 @@ function App() {
           const data = await res.json();
 
           const transcript = data.text?.trim();
-
+          console.log("Transcription: " +transcript)
           if (transcript) {
               setHistory((prev) => [...prev, { sender: "user", msg: transcript }]);
 
@@ -136,6 +104,47 @@ function App() {
 
       recorder.start();
       console.log("Recording started...");
+
+      // --- Setup AudioContext for silence detection ---
+      const audioContext = new AudioContext();
+      const source = audioContext.createMediaStreamSource(stream);
+      const analyser = audioContext.createAnalyser();
+      const dataArray = new Uint8Array(analyser.fftSize);
+      source.connect(analyser);
+
+      let silenceStart = performance.now();
+      const SILENCE_THRESHOLD = 10; // volume level (0–255)
+      const SILENCE_DURATION = 2000; // 3 seconds of silence
+
+      // Function to check for silence
+      const checkSilence = () => {
+        analyser.getByteFrequencyData(dataArray);
+        const average =
+          dataArray.reduce((a, b) => a + b, 0) / dataArray.length;
+
+        if (average < SILENCE_THRESHOLD) {
+          // Low volume
+          if (performance.now() - silenceStart > SILENCE_DURATION) {
+            console.log("Silence detected. Stopping recorder...");
+            recorder.stop();
+
+            // Delay cleanup slightly to ensure onstop runs
+            setTimeout(() => {
+              stream.getTracks().forEach((track) => track.stop());
+              audioContext.close();
+            }, 500);
+            return;
+          }
+        } else {
+          silenceStart = performance.now(); // Reset timer if sound is detected
+        }
+
+        requestAnimationFrame(checkSilence);
+      };
+      
+      setTimeout(() => checkSilence(), 2000);
+      console.log("Checking for silence...");
+      
     } catch (err) {
       console.error(err);
       setStatus("Error");
