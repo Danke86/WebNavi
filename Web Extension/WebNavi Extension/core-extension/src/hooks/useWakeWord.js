@@ -1,30 +1,39 @@
-import { useRef, useEffect } from "react";
+import { useEffect, useRef } from "react";
 
-export function useWakeWord({ listening, recording, status, startRecording, setStatus, setListening }) {
+export function useWakeWord({ startRecording, wakeword, setWakeWord, status, setStatus}) {
 
-  // --- Wake word detection ---
-  useEffect(() => {
-    // if processing or offline, skip wake word
-    // if (status === "Processing" || status === "Offline") return;
+    const statusRef = useRef(status);
 
-    const recognition = new window.webkitSpeechRecognition();
-    recognition.continuous = true;
-    recognition.lang = "en-US";
+    // Keep statusRef updated, but don't re-run effect
+    useEffect(() => {
+        statusRef.current = status;
+        console.log("Current status: ", status)
+    }, [status]);
 
-    recognition.onresult = (event) => {
-      const transcript = event.results[event.resultIndex][0].transcript.trim().toLowerCase();
-      console.log(transcript)
-      if (transcript.includes("hey navi") || transcript.includes("hey nabi") || transcript.includes("hi nabi") || transcript.includes("hi navi") || transcript.includes("hay navi")) {
-        startRecording();
-      }
-    };
+    // --- Wake word detection ---
+    useEffect(() => {
+        const recognition = new window.webkitSpeechRecognition();
+        recognition.continuous = true;
+        recognition.lang = "en-US";
+        recognition.interimResults = false
 
-    recognition.onerror = (e) => console.error("Wake-word error:", e);
+        recognition.onresult = (event) => {
+        const transcript = event.results[event.resultIndex][0].transcript.trim().toLowerCase();
+        // console.log(transcript)
+        if(statusRef.current === "Idle"){
+            if (transcript.includes("hey navi") || transcript.includes("hey nabi") || transcript.includes("hi nabi") || transcript.includes("hi navi") || transcript.includes("hay navi")) {
+                startRecording();
+            }
+        }
+        };
 
-    if (listening) recognition.start();
-    else recognition.stop();
+        recognition.onerror = (e) => console.error("Wake-word error:", e);
+        // console.log("Current status in useEffect: ", status)
 
-    return () => recognition.stop();
-  }, [listening]);
+        if (wakeword) recognition.start();
+        else recognition.stop();
+
+        return () => recognition.stop();
+    }, [wakeword]);
 
 }

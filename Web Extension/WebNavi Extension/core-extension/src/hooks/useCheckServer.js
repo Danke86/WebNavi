@@ -6,7 +6,9 @@ export function useCheckServer(props) {
           try {
             const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/ping`);
             if (res.ok) {
-              props.setStatus("Idle"); // server is online
+                if (props.status === "Offline"){
+                    props.setStatus("Idle"); // server is online
+                }
             } else {
               props.setStatus("Offline");
             }
@@ -17,7 +19,7 @@ export function useCheckServer(props) {
         };
     
         checkServer(); // check immediately
-        const interval = setInterval(checkServer, 5000); // check every 5 seconds
+        const interval = setInterval(checkServer, 5000); // check every 60 seconds
     
         return () => clearInterval(interval);
       }, []);

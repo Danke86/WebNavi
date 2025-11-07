@@ -6,10 +6,10 @@ export function StatusBar(props){
           <span className="status-txt">{props.status}</span>
         </div>
         <button
-          className={`wake-toggle ${props.listening ? "on" : "off"}`}
-          onClick={() => props.setListening(!props.listening)}
+          className={`wake-toggle ${props.wakeword ? "on" : "off"}`}
+          onClick={() => props.setWakeWord(!props.wakeword)}
         >
-          {props.listening ? "Wake: ON" : "Wake: OFF"}
+          {props.wakeword ? "Wake: ON" : "Wake: OFF"}
         </button>
       </div>    
     )

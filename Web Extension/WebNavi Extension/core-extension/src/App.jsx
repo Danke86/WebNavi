@@ -1,4 +1,4 @@
-import { useState, useEffect, use } from "react";
+import { useState } from "react";
 import "./app.css";
 
 import { useWakeWord } from "./hooks/useWakeWord.js";
@@ -9,42 +9,39 @@ import { StatusBar } from "./components/StatusBar.jsx";
 
 function App() {
   const [text, setText] = useState("");
-  const [listening, setListening] = useState(true); //WAKE WORD
-  const [recording, setRecording] = useState(false); //RECORDING FOR LLM/TEXT MESSAGE
-  const [status, setStatus] = useState("Idle"); // Offline, Idle, Recording, Processing, 
+  const [wakeword, setWakeWord] = useState(true); //WAKE WORD ENABLE
+  // const [recording, setRecording] = useState(false); //RECORDING FOR LLM/TEXT MESSAGE
+
+  const [status, setStatus] = useState("Idle"); // Offline, Idle, Recording, Processing, Error
   const [history, setHistory] = useState([]); // store all transcriptions
 
   // -- Check if backend is responding --
-  useCheckServer({setStatus})
+  useCheckServer({status, setStatus})
   
   // --- Voice recording + Whisper call ---
   const startRecording = async () => {
-  try {
-    setListening(false);
+    try {
     setStatus("Recording");
-    setRecording(true);
 
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
     const recorder = new MediaRecorder(stream);
     const chunks = [];
 
     recorder.ondataavailable = (e) => {
-      console.log("Data available, size:", e.data.size);
+      // console.log("Data available, size:", e.data.size);
       chunks.push(e.data);
     };
 
     recorder.onstop = async () => {
-      console.log("Recorder stopped, chunks:", chunks.length);
+      // console.log("Recorder stopped, chunks:", chunks.length);
       setStatus("Processing");
       
       const blob = new Blob(chunks, { type: "audio/webm" });
-      console.log("Blob created, size:", blob.size);
+      // console.log("Blob created, size:", blob.size);
 
       if (blob.size === 0) {
         console.error("No audio data recorded");
-        setStatus("Error: No audio");
-        setRecording(false);
-        setListening(true);
+        
         return;
       }
 
@@ -52,23 +49,22 @@ function App() {
       formData.append("file", blob, "recording.webm");
 
       try {
-        console.log("Sending to backend...");
+        // console.log("Sending to backend...");
         const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/transcribe`, {
           method: "POST",
           body: formData,
         });
 
-        console.log("Response status:", res.status);
+        // console.log("Response status:", res.status);
         
         if (!res.ok) {
           const errorText = await res.text();
           console.error("Transcription failed:", errorText);
-          setStatus("Error");
           return;
         }
 
         const data = await res.json();
-        console.log("Full response:", data);
+        // console.log("Full response:", data);
 
         const transcript = data.text?.trim();
         console.log("Transcription:", transcript);
@@ -77,20 +73,17 @@ function App() {
           setHistory((prev) => [...prev, { sender: "user", msg: transcript }]);
           await handleSend(transcript);
 
-          
+         
         } else {
           console.warn("Empty transcript received");
         }
       } catch (err) {
         console.error("Transcription error:", err);
-        setStatus("Error");
       } finally {
-        setRecording(false);
-        setStatus("Idle");
-        // Restart wake word detection after a short delay
-        setTimeout(() => {
-          setListening(true);
-        }, 500);
+         // Restart wake word detection after a short delay
+          setTimeout(() => {
+            setStatus("Idle");
+          }, 500);
       }
     };
 
@@ -147,20 +140,18 @@ function App() {
     
   } catch (err) {
     console.error("Recording error:", err);
-    setStatus("Error");
-    setRecording(false);
-    setListening(true);
+    setStatus("Idle");
+    // setWakeWord(true)
   }
   };
 
   // --- Wake word detection ---
   useWakeWord({
-    listening,
-    recording,
-    status,
     startRecording,
-    setStatus,
-    setListening,
+    wakeword,
+    setWakeWord,
+    status,
+    setStatus
   });
 
   // --- Manual text submission ---
@@ -198,15 +189,15 @@ function App() {
           placeholder="Type a message..."
           value={text}
           onChange={(e) => setText(e.target.value)}
-          disabled={recording}
+          disabled={status === "Idle" ? false : true }
         />
         <button type="submit">➤</button>
       </form>
 
       <StatusBar 
         status = {status}
-        listening = {listening}
-        setListening = {setListening}
+        wakeword = {wakeword}
+        setWakeWord = {setWakeWord}
       />
 
       <GrantPermissionsButton/>
