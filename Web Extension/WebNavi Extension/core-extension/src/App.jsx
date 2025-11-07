@@ -187,7 +187,7 @@ function App() {
         )}
       </div>
 
-      <form className="input-bar" onSubmit={handleSend}>
+      <div className="input-bar">
         <input
           type="text"
           placeholder="Type a message..."
@@ -196,7 +196,7 @@ function App() {
           disabled={status === "Idle" ? false : true }
         />
         <button onClick={() => handleSend(text)}>➤</button>
-      </form>
+      </div>
 
       <StatusBar 
         status = {status}
